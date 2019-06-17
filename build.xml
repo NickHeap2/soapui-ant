@@ -1,66 +1,58 @@
-<project name="WS-Test"  default="test" >
-	<property file="build.properties"/>
-	<property name="test.dir" value="test-results"/>
-	<property name="project.dir" location="project"/>
-	
-	<target name="clean">
-       <delete dir="${test.dir}"/>
+<project name="Soapui" default="test" xmlns:if="ant:if" xmlns:unless="ant:unless">
+  <property file="build.properties"/>
+  <property name="test.dir" value="test-results"/>
+  
+  <target name="clean">
+      <delete dir="${test.dir}"/>
+      <delete>
+        <fileset dir="." includes="*.log"/>
+      </delete>
     </target>
 
-	<target name="init">
+  <target name="init">
       <mkdir dir="${test.dir}"/>
-    </target>
+  </target>
 
-	<target name="test-with-properties" depends="init">
-		<java classname="com.eviware.soapui.tools.SoapUITestCaseRunner" errorproperty="tests-failed" fork="yes" dir="${test.dir}">
-		  <arg line="-j -M -r -a -f${basedir}/${test.dir}"/>
-		  <arg value="-e${wsdl.url}"/>
-		  <arg value="-s${soapui.testsuite}"/>
-		  <arg value="${project.dir}/${soapui.project}"/>
-		  <arg value="-x${user.name}"/>
-		  <arg value="-x${user.password}"/>
-		  <classpath>
-			<fileset dir="lib" includes="*.jar"/>
-		  </classpath>
-		</java>
-	</target>
+  <target name="test" depends="init">
+    <available file="${soapui.project}" property="project_found"/>
+    <fail message="Project file not found: ${soapui.project}">
+      <condition>
+        <not>
+          <isset property="project_found" />
+        </not>
+      </condition>
+    </fail>
+
+    <echo message="Running tests for project: ${soapui.project}" />
+    <java classname="com.eviware.soapui.tools.SoapUITestCaseRunner">
+      <arg value="-a"/>
+      <arg value="-A"/>
+      <arg value="-f${test.dir}"/>
+      <arg value="-j"/>
+      <arg value="-M"/>
+      <arg value="-r"/>
+      <arg value="-tsoapui-settings.xml"/>
+      <!-- <arg value="-PHermesConfigPath=.hermes"/> -->
+      <arg unless:blank="soapui.testsuite" value="-s${soapui.testsuite}"/>
+      <arg value="${soapui.project}"/>
+      <classpath>
+        <fileset dir="soapui/bin" includes="*.jar"/>
+        <fileset dir="soapui/lib" includes="*.jar"/>
+        <!-- <fileset dir="hermesJMS/lib" includes="*.jar"/> -->
+      </classpath>
+    </java>
+  </target>
+
 	
-	<target name="test" depends="init">
-		<java classname="com.eviware.soapui.tools.SoapUITestCaseRunner" errorproperty="tests-failed" fork="yes" dir="${test.dir}">
-		  <arg line="-j -M -r -a -f${basedir}/${test.dir}"/>
-		  <arg value="${project.dir}/${soapui.project}"/>
-		  <classpath>
-			<fileset dir="lib" includes="*.jar"/>
-		  </classpath>
-		</java>
-	</target>
-	
-	<target name="test-single-project" depends="init">
-		<antcall target="run-single-test">
-		  <param name="project" value="${project.dir}/${soapui.project}"/>
-		</antcall>
-	</target>
-	
-	<target name="run-single-test">
-	    <java classname="com.eviware.soapui.tools.SoapUITestCaseRunner" errorproperty="tests-failed" fork="yes" dir="${test.dir}">
-		  <arg line="-j -M -r -a -f${basedir}/${test.dir}"/>
-		  <arg value="${project}"/>
-		  <classpath>
-			<fileset dir="lib" includes="*.jar"/>
-		  </classpath>
-		</java>
-	</target>
-	
-	
-	<target name="report">
-		<junitreport todir="${test.dir}">
-		  <fileset dir="${test.dir}">
-			<include name="TEST-*.xml"/>
-		  </fileset>
-		  <report format="frames" todir="${test.dir}/reports/html"/>
-		</junitreport>
+  <target name="report">
+    <junitreport todir="${test.dir}">
+      <fileset dir="${test.dir}">
+      <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${test.dir}/reports/html"/>
+    </junitreport>
     </target>
-	
-	
+  
+  
 </project>
 
