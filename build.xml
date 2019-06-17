@@ -1,6 +1,7 @@
 <project name="Soapui" default="test" xmlns:if="ant:if" xmlns:unless="ant:unless">
   <property file="build.properties"/>
   <property name="test.dir" value="test-results"/>
+  <property name="soapui.settings" value="soapui-settings.xml"/>
   
   <target name="clean">
       <delete dir="${test.dir}"/>
@@ -31,7 +32,7 @@
       <arg value="-j"/>
       <arg value="-M"/>
       <arg value="-r"/>
-      <arg value="-tsoapui-settings.xml"/>
+      <arg value="-t${soapui.settings}"/>
       <!-- <arg value="-PHermesConfigPath=.hermes"/> -->
       <arg if:set="soapui.testsuite" unless:blank="${soapui.testsuite}" value="-s${soapui.testsuite}"/>
       <arg value="${soapui.project}"/>
