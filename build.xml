@@ -25,7 +25,7 @@
     </fail>
 
     <echo message="Running tests for project: ${soapui.project}" />
-    <java classname="com.eviware.soapui.tools.SoapUITestCaseRunner" failonerror="true">
+    <java classname="com.eviware.soapui.tools.SoapUITestCaseRunner">
       <arg value="-a"/>
       <arg value="-A"/>
       <arg value="-f${test.dir}"/>
